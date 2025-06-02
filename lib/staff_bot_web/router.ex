@@ -7,5 +7,6 @@ defmodule StaffBotWeb.Router do
 
   scope "/api", StaffBotWeb do
     pipe_through :api
+    post "/webhook", WebhookController, :webhook
   end
 end

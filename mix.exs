@@ -32,7 +32,6 @@ defmodule StaffBot.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:dotenv, "~> 3.1.0"},
       {:jose, "~> 1.11"},
       {:phoenix, "~> 1.7.21"},
       {:phoenix_ecto, "~> 4.5"},
@@ -43,6 +42,8 @@ defmodule StaffBot.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      {:finch, "~> 0.19.0"},
+      {:instructor, "~> 0.1.0"},
       {:tidewave, "~> 0.1.7", only: :dev}
     ]
   end
