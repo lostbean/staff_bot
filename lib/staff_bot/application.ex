@@ -14,6 +14,7 @@ defmodule StaffBot.Application do
        repos: Application.fetch_env!(:staff_bot, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:staff_bot, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: StaffBot.PubSub},
+      {Finch, name: StaffBot.Finch},
       # Start a worker by calling: StaffBot.Worker.start_link(arg)
       # {StaffBot.Worker, arg},
       # Start to serve requests, typically the last entry

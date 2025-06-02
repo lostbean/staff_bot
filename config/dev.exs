@@ -16,7 +16,7 @@ config :staff_bot, StaffBot.Repo,
 config :staff_bot, StaffBotWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {127, 0, 0, 1}, port: 8008],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
@@ -58,3 +58,6 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# GitHub configuration for development - will fallback to environment variable
+config :staff_bot, :github, secret: System.get_env("GITHUB_SECRET", "your_github_secret_here")
