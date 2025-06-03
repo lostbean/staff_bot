@@ -45,6 +45,8 @@ defmodule StaffBot.MixProject do
       {:bandit, "~> 1.5"},
       {:finch, "~> 0.19.0"},
       {:instructor, "~> 0.1.0"},
+      {:ueberauth, "~> 0.10"},
+      {:ueberauth_github, "~> 0.8"},
       {:tidewave, "~> 0.1.7", only: :dev}
     ]
   end

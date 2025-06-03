@@ -36,6 +36,21 @@ config :staff_bot, :github, secret: System.get_env("GITHUB_SECRET")
 config :staff_bot, :github, private_key: System.get_env("GITHUB_SECRET")
 config :staff_bot, :github, app_id: System.get_env("GITHUB_APP_ID"")
 
+# Ueberauth configuration
+config :ueberauth, Ueberauth,
+  providers: [
+    github:
+      {Ueberauth.Strategy.Github,
+       [
+         default_scope: "repo,issues:write,pull_requests:write",
+         allow_private_emails: true
+       ]}
+  ]
+
+config :ueberauth, Ueberauth.Strategy.Github.OAuth,
+  client_id: System.get_env("GITHUB_CLIENT_ID"),
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 

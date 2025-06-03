@@ -5,14 +5,15 @@ defmodule StaffBot.Domain.User do
   schema "users" do
     field :username, :string
     field :installation_id, :string
+    field :oauth_token, :string
 
     timestamps()
   end
 
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :installation_id])
-    |> validate_required([:username, :installation_id])
+    |> cast(attrs, [:username, :installation_id, :oauth_token])
+    |> validate_required([:username])
     |> unique_constraint(:installation_id)
   end
 end
