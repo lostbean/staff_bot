@@ -1,8 +1,8 @@
 defmodule StaffBot.GitHub.AiResponse do
   use Ecto.Schema
-  use Instructor.Validator
+  use Instructor
 
-  @doc """
+  @llm_doc """
   AI code review response containing analysis of code changes against rules.
 
   ## Field Descriptions:

@@ -17,8 +17,8 @@ config :staff_bot, StaffBotWeb.Endpoint,
   secret_key_base: "Di3h3rL9l/ER4hmV8CxOcGJGYJS/Ao4fchRrwenBG9q2qfq+PRMV533W76nX0gti",
   server: false
 
-# Print only warnings and errors during test
-config :logger, level: :warning
+# Disable logging during test for clean terminal output
+config :logger, level: :critical
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime

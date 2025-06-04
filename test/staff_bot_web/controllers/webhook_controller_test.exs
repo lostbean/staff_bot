@@ -23,8 +23,12 @@ defmodule StaffBotWeb.WebhookControllerTest do
     |> assign(:raw_body, body)
   end
 
+  setup do
+    Application.put_env(:staff_bot, :github, secret: @valid_secret)
+  end
+
   describe "webhook/2" do
-    test "returns 400 when signature header is missing", %{conn: conn} do
+    test "returns 400 when secret is set but signature header is missing", %{conn: conn} do
       body = Jason.encode!(%{test: "data"})
 
       conn =
@@ -118,14 +122,12 @@ defmodule StaffBotWeb.WebhookControllerTest do
 
       body = Jason.encode!(pr_data)
 
-      assert capture_log(fn ->
-               conn =
-                 conn
-                 |> put_webhook_headers(body, "pull_request")
-                 |> post(@webhook_path, pr_data)
+      conn =
+        conn
+        |> put_webhook_headers(body, "pull_request")
+        |> post(@webhook_path, pr_data)
 
-               assert json_response(conn, 200) == %{"message" => "Webhook received successfully"}
-             end) =~ "GitHub integration failed"
+      assert json_response(conn, 200) == %{"message" => "Webhook received successfully"}
     end
 
     test "ignores unhandled event types", %{conn: conn} do

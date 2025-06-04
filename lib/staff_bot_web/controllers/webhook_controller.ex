@@ -3,7 +3,7 @@ defmodule StaffBotWeb.WebhookController do
   require Logger
 
   alias StaffBot.DB.Users
-  alias StaffBot.GitHub.{AiWorkflow, JWT, API}
+  alias StaffBot.GitHub.{EnhancedAiWorkflowReactor, JWT, API}
 
   defp github_secret, do: Application.get_env(:staff_bot, :github)[:secret]
 
@@ -76,7 +76,6 @@ defmodule StaffBotWeb.WebhookController do
     head_sha = pr["head"]["sha"]
 
     diff_url = "https://api.github.com/repos/#{repo_full_name}/compare/#{base_sha}...#{head_sha}"
-    comment_url = "https://api.github.com/repos/#{repo_full_name}/issues/#{pr_number}/comments"
 
     with {:ok, installation_id} <- fetch_installation_id(username),
          {:ok, access_token} <- fetch_access_token(installation_id),
@@ -88,29 +87,32 @@ defmodule StaffBotWeb.WebhookController do
           %{filename => patch || ""}
         end)
 
-      # Fetch AI rules -->
-      ai_rules = AiWorkflow.get_rules(repo_full_name, access_token)
+      # Run enhanced AI workflow using Reactor
+      case Reactor.run(EnhancedAiWorkflowReactor, %{
+             repo: repo_full_name,
+             token: access_token,
+             code: code_diff,
+             pr_number: pr_number,
+             sha: head_sha
+           }) do
+        {:ok, _result} ->
+          Logger.info("✅ AI workflow completed successfully!")
 
-      if map_size(ai_rules) == 0 do
-        Logger.info("⚠️ No AI rules found. So not commenting anything...")
-        {:ok}
-      else
-        # Add AI suggestions as comment -->
-        case AiWorkflow.generate_ai_response(ai_rules, code_diff) do
-          {:ok, ai_text} ->
-            case AiWorkflow.format_ai_response(ai_text) do
-              {:ok, comment_text} ->
-                API.post(comment_url, %{body: comment_text}, access_token)
-                Logger.info("✏️ Comment posted!")
+        {:error, reason} ->
+          Logger.error("❌ AI workflow failed: #{inspect(reason)}")
 
-              {:error, reason} ->
-                Logger.error("❌ Failed to format AI response: #{inspect(reason)}")
-                {:error, reason}
-            end
+          # Set PR status to error on failure
+          status_url = "https://api.github.com/repos/#{repo_full_name}/statuses/#{head_sha}"
 
-          {:error, reason} ->
-            Logger.error("⚠️ AI failed to generate response: #{inspect(reason)}")
-        end
+          API.post(
+            status_url,
+            %{
+              state: "error",
+              context: "ai-review",
+              description: "AI review encountered an error"
+            },
+            access_token
+          )
       end
     else
       {:error, reason} ->

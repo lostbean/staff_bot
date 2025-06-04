@@ -44,6 +44,13 @@ defmodule StaffBot.MixProject do
       {:bandit, "~> 1.5"},
       {:finch, "~> 0.19.0"},
       {:instructor, "~> 0.1.0"},
+
+      # Latest release is broken but main is already fixed
+      {:reactor, git: "https://github.com/ash-project/reactor.git"},
+      # {:reactor, "~> 0.15.4"},
+
+      # Test and Dev
+      {:mimic, "~> 1.12", only: :test},
       {:tidewave, "~> 0.1.7", only: :dev}
     ]
   end
