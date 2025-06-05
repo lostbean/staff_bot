@@ -121,6 +121,67 @@ mix hex.info <package>            # Check latest package version
 - `GITHUB_SECRET`: GitHub webhook secret (optional for development)
 - Database: SQLite with Ecto
 
+## Deployment (Fly.io)
+
+### Cost-Optimized Configuration
+- **Machine Size**: 256MB RAM, 1 shared CPU (minimal tier)
+- **Auto-scaling**: Machines stop when idle, start on demand
+- **Min Running**: 0 machines (stops completely when not in use)
+- **Database**: SQLite with persistent volume mount
+- **Estimated Cost**: ~$1.94/month when idle, ~$5-10/month with light usage
+
+### Required Environment Variables
+```bash
+# Generate with: mix phx.gen.secret
+SECRET_KEY_BASE=your_secret_key_base
+
+# GitHub App credentials
+GITHUB_APP_ID=your_github_app_id
+GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+GITHUB_SECRET=your_webhook_secret
+
+# Gemini AI API key
+GEMINI_API_KEY=your_gemini_api_key
+
+# Phoenix server flag
+PHX_SERVER=true
+```
+
+### Deployment Commands
+```bash
+# Install flyctl and authenticate
+fly auth login
+
+# Create app (run once)
+fly apps create staff-bot
+
+# Create persistent volume for SQLite
+fly volumes create staff_bot_data --region iad --size 1
+
+# Set environment variables
+fly secrets set SECRET_KEY_BASE="$(mix phx.gen.secret)"
+fly secrets set GITHUB_APP_ID="your_app_id"
+fly secrets set GITHUB_PRIVATE_KEY="your_private_key"
+fly secrets set GITHUB_SECRET="your_webhook_secret"
+fly secrets set GEMINI_API_KEY="your_api_key"
+fly secrets set PHX_SERVER="true"
+
+# Deploy application
+fly deploy
+
+# Check deployment status
+fly status
+fly logs
+```
+
+### GitHub App Setup
+1. Create GitHub App at https://github.com/settings/apps
+2. Set webhook URL to: `https://staff-bot.fly.dev/api/webhook`
+3. Enable webhook events: `pull_request`, `installation`
+4. Set permissions: Contents (read), Pull requests (write), Checks (write)
+5. Generate and download private key
+6. Install app on target repositories
+
 ## Recent Enhancements
 - ✅ Migrated from Mox to Mimic for testing
 - ✅ Created reusable step modules for GitHub operations
@@ -128,3 +189,4 @@ mix hex.info <package>            # Check latest package version
 - ✅ Enhanced webhook controller with proper error handling
 - ✅ Comprehensive test coverage for all step modules
 - ✅ Configured clean test output with minimal logging noise
+- ✅ Fly.io deployment setup with cost optimization

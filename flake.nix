@@ -42,6 +42,7 @@
               rebar3
               nodejs_22
               openssl
+              flyctl
             ]
             ++ (
               if isDarwin then
