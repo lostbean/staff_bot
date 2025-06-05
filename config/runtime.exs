@@ -22,15 +22,21 @@ end
 
 if config_env() == :prod do
   database_path =
-    System.get_env("DATABASE_PATH") ||
-      raise """
-      environment variable DATABASE_PATH is missing.
-      For example: /etc/staff_bot/staff_bot.db
-      """
+    System.get_env("DATABASE_PATH") || "/app/data/staff_bot.db"
 
   config :staff_bot, StaffBot.Repo,
     database: database_path,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
+
+  # GitHub configuration
+  config :staff_bot, :github,
+    secret: System.get_env("GITHUB_SECRET"),
+    app_id: System.get_env("GITHUB_APP_ID"),
+    private_key: System.get_env("GITHUB_PRIVATE_KEY")
+
+  # Instructor configuration for AI
+  config :instructor,
+    gemini: [api_key: System.get_env("GEMINI_API_KEY")]
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
