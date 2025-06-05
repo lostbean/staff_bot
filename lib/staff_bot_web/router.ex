@@ -9,4 +9,8 @@ defmodule StaffBotWeb.Router do
     pipe_through :api
     post "/webhook", WebhookController, :webhook
   end
+
+  scope "/", StaffBotWeb do
+    get "/health", HealthController, :check
+  end
 end
