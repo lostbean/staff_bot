@@ -34,24 +34,13 @@ defmodule StaffBot.GitHub.EnhancedAiWorkflowReactorTest do
         end
       end)
 
-      # Mock API calls for fetching rules
-      file_list = [
-        %{
-          "type" => "file",
-          "name" => "no_io_puts.md",
-          "url" => "https://api.github.com/repos/test/repo/contents/ai-code-rules/no_io_puts.md"
-        }
-      ]
+      # Mock API calls for fetching rules (new default behavior fetches CLAUDE.md)
+      claude_content = %{"content" => Base.encode64("Avoid using IO.puts in production code")}
 
-      rule_content = %{"content" => Base.encode64("Avoid using IO.puts in production code")}
-
-      expect(API, :get, 2, fn url, ^token ->
+      expect(API, :get, fn url, ^token ->
         case url do
-          "https://api.github.com/repos/test/repo/contents/ai-code-rules" ->
-            {:ok, file_list}
-
-          "https://api.github.com/repos/test/repo/contents/ai-code-rules/no_io_puts.md" ->
-            {:ok, rule_content}
+          "https://api.github.com/repos/test/repo/contents/CLAUDE.md" ->
+            {:ok, claude_content}
         end
       end)
 
@@ -139,24 +128,13 @@ defmodule StaffBot.GitHub.EnhancedAiWorkflowReactorTest do
       pr_number = 123
       sha = "abc123"
 
-      # Mock API calls for fetching rules
-      file_list = [
-        %{
-          "type" => "file",
-          "name" => "no_io_puts.md",
-          "url" => "https://api.github.com/repos/test/repo/contents/ai-code-rules/no_io_puts.md"
-        }
-      ]
+      # Mock API calls for fetching rules (new default behavior fetches CLAUDE.md)
+      claude_content = %{"content" => Base.encode64("Avoid using IO.puts in production code")}
 
-      rule_content = %{"content" => Base.encode64("Avoid using IO.puts in production code")}
-
-      expect(API, :get, 2, fn url, ^token ->
+      expect(API, :get, fn url, ^token ->
         case url do
-          "https://api.github.com/repos/test/repo/contents/ai-code-rules" ->
-            {:ok, file_list}
-
-          "https://api.github.com/repos/test/repo/contents/ai-code-rules/no_io_puts.md" ->
-            {:ok, rule_content}
+          "https://api.github.com/repos/test/repo/contents/CLAUDE.md" ->
+            {:ok, claude_content}
         end
       end)
 

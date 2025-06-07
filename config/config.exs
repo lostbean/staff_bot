@@ -30,6 +30,15 @@ config :logger, :console,
 config :instructor,
   adapter: Instructor.Adapters.Gemini
 
+# GitHub rules configuration
+config :staff_bot, :github_rules,
+  patterns: [
+    "CLAUDE.md",
+    "claude.md",
+    "ai-code-rules/*.md",
+    "docs/ai-rules/*.md"
+  ]
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
