@@ -7,14 +7,14 @@ kill_signal = 'SIGTERM'
 [env]
   DATABASE_PATH = '/app/data/staff_bot.db'
   PHX_HOST = 'staff-bot.fly.dev'
-  PORT = '8080'
+  PORT = '8008'
 
 [experimental]
   auto_rollback = true
 
 [[services]]
   protocol = 'tcp'
-  internal_port = 8080
+  internal_port = 8008
   processes = ['app']
 
   [[services.ports]]
@@ -51,7 +51,7 @@ kill_signal = 'SIGTERM'
   cpus = 1
 
 [http_service]
-  internal_port = 8080
+  internal_port = 8008
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
