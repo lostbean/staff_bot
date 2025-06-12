@@ -7,6 +7,10 @@ defmodule StaffBot.Application do
 
   @impl true
   def start(_type, _args) do
+    # volume may not be ready once your application release runs and the `migrate` release script may not work.
+    # So to fix this we need to run migrations on application start (https://fly.io/docs/elixir/advanced-guides/sqlite3/)
+    StaffBot.Release.migrate()
+
     children = [
       StaffBotWeb.Telemetry,
       StaffBot.Repo,

@@ -4,10 +4,8 @@ kill_signal = 'SIGTERM'
 
 [build]
 
-[deploy]
-  release_command = '/app/bin/migrate'
-
 [env]
+  DATABASE_PATH = '/app/data/staff_bot.db'
   PHX_HOST = 'staff-bot.fly.dev'
   PORT = '8080'
 
