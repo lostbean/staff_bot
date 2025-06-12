@@ -58,9 +58,10 @@ defmodule StaffBotWeb.WebhookController do
   end
 
   defp handle_event("installation", %{
-         "action" => "created",
+         "action" => action,
          "installation" => %{"id" => id, "account" => %{"login" => login}}
-       }) do
+       })
+       when action in ["added", "created"] do
     Logger.info("Handling User Installation.... ")
     Users.insert_user(login, to_string(id))
   end
