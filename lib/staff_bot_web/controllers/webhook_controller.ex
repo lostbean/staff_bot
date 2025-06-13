@@ -66,6 +66,14 @@ defmodule StaffBotWeb.WebhookController do
     Users.insert_user(login, to_string(id))
   end
 
+  defp handle_event("installation_repositories", %{
+         "action" => "added",
+         "installation" => %{"id" => id, "account" => %{"login" => login}}
+       }) do
+    Logger.info("Handling User Installation.... ")
+    Users.insert_user(login, to_string(id))
+  end
+
   defp handle_event("pull_request", %{"action" => action} = data)
        when action in ["opened", "synchronize", "reopened"] do
     repo = data["repository"]
@@ -121,11 +129,15 @@ defmodule StaffBotWeb.WebhookController do
     end
   end
 
-  defp handle_event(_, _), do: :ok
+  defp handle_event(event_type, payload) do
+    dbg(payload)
+    Logger.warning("Unhandled event_type #{event_type}")
+    :ok
+  end
 
   defp fetch_installation_id(username) do
     case Users.get_installation_id_by_username(username) do
-      nil -> {:error, :installation_id_not_found}
+      nil -> {:error, "User #{username} not found"}
       id -> {:ok, id}
     end
   end
