@@ -30,9 +30,13 @@ defmodule StaffBot.GitHub.Steps.GenerateAiResponseStep do
       {:ok, response} ->
         {:ok, response}
 
-      {:error, changeset} ->
-        Logger.error("❌ AI response validation failed: #{inspect(changeset.errors)}")
-        {:error, %{errors: "Invalid LLM format"}}
+      {:error, error} ->
+        error_details = case error do
+          %Ecto.Changeset{} = changeset -> inspect(changeset.errors)
+          other -> inspect(other)
+        end
+        Logger.error("❌ AI response validation failed: #{error_details}")
+        {:error, %{errors: "Invalid LLM format", details: error_details}}
     end
   rescue
     e ->
@@ -43,19 +47,14 @@ defmodule StaffBot.GitHub.Steps.GenerateAiResponseStep do
   @impl Reactor.Step
   def compensate(reason, _arguments, _context, _step) do
     case reason do
-      %{errors: _} ->
+      %{errors: "Invalid LLM format"} ->
         # Validation errors - likely retryable
         Logger.warning("🔄 Retrying AI response generation due to validation error")
         :retry
 
-      %{"error" => %{"code" => code}} when code in [429, 500, 502, 503, 504] ->
-        # API rate limiting or server errors - retryable
-        Logger.warning("🔄 Retrying AI response generation due to API error: #{code}")
-        :retry
-
-      _other ->
+      other ->
         # Other errors - not retryable
-        Logger.error("❌ AI response generation failed permanently: #{inspect(reason)}")
+        Logger.error("❌ AI response generation failed permanently: #{inspect(other)}")
         :ok
     end
   rescue

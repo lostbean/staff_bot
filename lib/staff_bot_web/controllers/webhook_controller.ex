@@ -66,6 +66,21 @@ defmodule StaffBotWeb.WebhookController do
     Users.insert_user(login, to_string(id))
   end
 
+  defp handle_event("installation_repositories", %{
+         "action" => "added",
+         "installation" => %{"id" => id, "account" => %{"login" => login}}
+       }) do
+    Logger.info("Handling User Installation.... ")
+    Users.insert_user(login, to_string(id))
+  end
+
+  defp get_file_diff(payload) do
+    case payload do
+      %{"filename" => filename, "patch" => patch} -> %{filename => patch || ""}
+        _ -> nil
+    end
+  end
+
   defp handle_event("pull_request", %{"action" => action} = data)
        when action in ["opened", "synchronize", "reopened"] do
     repo = data["repository"]
@@ -82,11 +97,11 @@ defmodule StaffBotWeb.WebhookController do
          {:ok, access_token} <- fetch_access_token(installation_id),
          {:ok, %{"files" => files}} <- API.get(diff_url, access_token) do
       # Get the changes in the code
+
       code_diff =
         files
-        |> Enum.map(fn %{"filename" => filename, "patch" => patch} ->
-          %{filename => patch || ""}
-        end)
+        |> Enum.map(&get_file_diff/1)
+        |> Enum.filter(&(!is_nil(&1)))
 
       # Run enhanced AI workflow using Reactor
       case Reactor.run(EnhancedAiWorkflowReactor, %{
@@ -121,11 +136,14 @@ defmodule StaffBotWeb.WebhookController do
     end
   end
 
-  defp handle_event(_, _), do: :ok
+  defp handle_event(event_type, payload) do
+    Logger.warning("Unhandled event_type #{event_type}")
+    :ok
+  end
 
   defp fetch_installation_id(username) do
     case Users.get_installation_id_by_username(username) do
-      nil -> {:error, :installation_id_not_found}
+      nil -> {:error, "User #{username} not found"}
       id -> {:ok, id}
     end
   end

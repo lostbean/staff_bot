@@ -29,7 +29,7 @@ defmodule StaffBot.GitHub.Steps.FetchRulesStep do
             Map.merge(acc, pattern_rules)
 
           {:error, reason} ->
-            Logger.warning("⚠️ Pattern '#{pattern}' failed: #{inspect(reason)}")
+            Logger.info("⚠️ Pattern '#{pattern}' failed: #{inspect(reason)}")
             acc
         end
       end)
