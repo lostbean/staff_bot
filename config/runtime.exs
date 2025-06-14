@@ -22,15 +22,21 @@ end
 
 if config_env() == :prod do
   database_path =
-    System.get_env("DATABASE_PATH") ||
-      raise """
-      environment variable DATABASE_PATH is missing.
-      For example: /etc/staff_bot/staff_bot.db
-      """
+    System.get_env("DATABASE_PATH") || "/app/data/staff_bot.db"
 
   config :staff_bot, StaffBot.Repo,
     database: database_path,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
+
+  # GitHub configuration
+  config :staff_bot, :github,
+    secret: System.get_env("GITHUB_SECRET"),
+    app_id: System.get_env("GITHUB_APP_ID"),
+    private_key: System.get_env("GITHUB_PRIVATE_KEY")
+
+  # Instructor configuration for AI
+  config :instructor,
+    gemini: [api_key: System.get_env("GEMINI_API_KEY")]
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
@@ -45,7 +51,7 @@ if config_env() == :prod do
       """
 
   host = System.get_env("PHX_HOST") || "example.com"
-  port = String.to_integer(System.get_env("PORT") || "4000")
+  port = String.to_integer(System.get_env("PORT") || "8008")
 
   config :staff_bot, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
@@ -56,7 +62,7 @@ if config_env() == :prod do
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
       # See the documentation on https://hexdocs.pm/bandit/Bandit.html#t:options/0
       # for details about using IPv6 vs IPv4 and loopback vs public addresses.
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
+      ip: {0, 0, 0, 0},
       port: port
     ],
     secret_key_base: secret_key_base

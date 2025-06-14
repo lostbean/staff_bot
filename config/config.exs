@@ -28,13 +28,16 @@ config :logger, :console,
   metadata: [:request_id]
 
 config :instructor,
-  adapter: Instructor.Adapters.Gemini,
-  api_key: System.fetch_env!("GEMINI_API_KEY")
+  adapter: Instructor.Adapters.Gemini
 
-# GitHub configuration
-config :staff_bot, :github, secret: System.get_env("GITHUB_SECRET")
-config :staff_bot, :github, private_key: System.get_env("GITHUB_PRIVATE_KEY")
-config :staff_bot, :github, app_id: System.get_env("GITHUB_APP_ID")
+# GitHub rules configuration
+config :staff_bot, :github_rules,
+  patterns: [
+    "CLAUDE.md",
+    "claude.md",
+    "ai-code-rules/*.md",
+    "docs/ai-rules/*.md"
+  ]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
